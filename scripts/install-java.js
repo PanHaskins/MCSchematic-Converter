@@ -1,8 +1,7 @@
-"use strict";
-
-const { exec } = require("child_process");
-const fs = require("fs");
-const path = require("path");
+import { exec } from "child_process";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 
 class JavaInstaller {
   constructor() {
@@ -118,7 +117,7 @@ async function installJava() {
   return result;
 }
 
-if (require.main === module) {
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
   installJava().then(result => {
     if (result.success) {
       console.log("🎉 Java ready");
@@ -128,4 +127,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { installJava, JavaInstaller };
+export { installJava, JavaInstaller };
