@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Minecraft Schematic Converter</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Animated Background -->
+  <div class="bg-animation">
+    <div class="floating-cube"></div>
+    <div class="floating-cube"></div>
+    <div class="floating-cube"></div>
+    <div class="floating-cube"></div>
+    <div class="floating-cube"></div>
+  </div>
+
+  <div class="container">
+    <!-- Main Page -->
+    <div class="main-page" id="main-page">
+      <div class="header">
+        <h1 class="title">SCHEMATIC CONVERTER</h1>
+        <p class="subtitle">Convert between Minecraft schematic formats</p>
+      </div>
+
+      <div class="process-steps">
+        <div class="step">
+          <div class="step-icon" id="upload-icon">1</div>
+          <div class="step-label">Upload</div>
+        </div>
+        <div class="step-connector"></div>
+        <div class="step">
+          <div class="step-icon inactive" id="convert-icon">2</div>
+          <div class="step-label">Convert</div>
+        </div>
+        <div class="step-connector"></div>
+        <div class="step">
+          <div class="step-icon inactive" id="download-icon">3</div>
+          <div class="step-label">Download</div>
+        </div>
+      </div>
+
+      <div class="main-content">
+        <!-- File Upload Card -->
+        <div class="card" id="upload-card">
+          <div class="card-title">Choose Files</div>
+          <div class="card-description">Drag & drop or click to select your schematic files</div>
+          <div class="file-upload" id="file-upload">
+            <div class="file-upload-icon">📁</div>
+            <div class="file-upload-text">Select Files</div>
+            <div class="file-upload-subtext">Supported: .litematic, .schematic, .schem, .nbt</div>
+            <input type="file" class="file-input" id="file-input" multiple accept=".litematic,.schematic,.schem,.nbt">
+          </div>
+          <div class="selected-files" id="selected-files"></div>
+        </div>
+
+        <!-- Format Selection Card -->
+        <div class="card" id="format-card">
+          <div class="card-title">Select Output Format</div>
+          <div class="card-description">Choose the format you want to convert to</div>
+          <div class="format-options">
+            <div class="format-option" data-format="litematic">
+              <div class="format-name">Litematica</div>
+              <div class="format-ext">.litematic</div>
+            </div>
+            <div class="format-option" data-format="schematic">
+              <div class="format-name">WorldEdit</div>
+              <div class="format-ext">.schematic</div>
+            </div>
+            <div class="format-option" data-format="schem">
+              <div class="format-name">Sponge</div>
+              <div class="format-ext">.schem</div>
+            </div>
+            <div class="format-option" data-format="nbt">
+              <div class="format-name">Structure</div>
+              <div class="format-ext">.nbt</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="progress-section" id="progress-section">
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <div class="progress-text" id="progress-text">Converting files...</div>
+      </div>
+
+      <div class="action-section">
+        <button class="start-button" id="start-button" disabled>START</button>
+      </div>
+    </div>
+
+    <!-- Download Page -->
+    <div class="download-page" id="download-page">
+      <div class="header">
+        <h1 class="title">CONVERSION COMPLETE</h1>
+        <p class="subtitle">Your files have been successfully converted</p>
+      </div>
+      <div class="download-success">
+        <div class="download-icon">✅</div>
+        <div class="download-title">SUCCESS!</div>
+        <div class="download-description">All files have been converted to the selected format</div>
+        <div class="download-files" id="download-files"></div>
+        <div>
+          <button class="download-all-button" id="download-all-button">Download All</button>
+          <button class="new-conversion-button" id="new-conversion-button">New Conversion</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <a href="#" class="footer-link">GitHub</a>
+      <a href="#" class="footer-link">About</a>
+    </div>
+    <div class="footer-info">
+      Minecraft Schematic Converter • Built with ❤️ for the community
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
