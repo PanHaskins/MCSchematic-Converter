@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const JAR_PATH = path.join(__dirname, '..', 'schemconvert.jar');
+const JAVA_CMD = process.env.JAVA_PATH || 'java';
 
 /**
  * Run SchemConvert CLI tool.
@@ -15,8 +16,11 @@ const JAR_PATH = path.join(__dirname, '..', 'schemconvert.jar');
 export default function runSchemConvert(input, output, format) {
   return new Promise((resolve, reject) => {
     const args = ['-jar', JAR_PATH, '--input', input, '--output', output, '--format', format];
-    const proc = spawn('java', args);
+    const proc = spawn(JAVA_CMD, args);
     let error = '';
+    proc.on('error', err => {
+      reject(err);
+    });
     proc.stderr.on('data', d => { error += d.toString(); });
     proc.on('close', code => {
       if (code === 0) {

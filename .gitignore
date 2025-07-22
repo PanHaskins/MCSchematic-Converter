@@ -1,0 +1,6 @@
+node_modules
+converted/
+uploads/
+test/output/
+.env
+package-lock.json
