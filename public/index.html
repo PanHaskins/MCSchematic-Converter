@@ -22,7 +22,7 @@
     <div class="main-page" id="main-page">
       <div class="header">
         <h1 class="title">SCHEMATIC CONVERTER</h1>
-        <p class="subtitle">Convert between Minecraft schematic formats</p>
+        <p class="subtitle">Convert between Minecraft formats</p>
       </div>
 
       <div class="process-steps">
@@ -46,12 +46,12 @@
         <!-- File Upload Card -->
         <div class="card fade-in" id="upload-card">
           <div class="card-title">Choose Files</div>
-          <div class="card-description">Drag & drop or click to select your schematic files</div>
+          <div class="card-description">Drag & drop or click to select your files</div>
           <div class="file-upload" id="file-upload">
             <div class="file-upload-icon">📁</div>
             <div class="file-upload-text">Select Files</div>
-            <div class="file-upload-subtext">Supported: .litematic, .schematic, .schem, .nbt</div>
-            <input type="file" class="file-input" id="file-input" multiple accept=".litematic,.schematic,.schem,.nbt">
+            <div class="file-upload-subtext">Supported: .litematic, .schem, .nbt, .bp</div>
+            <input type="file" class="file-input" id="file-input" multiple accept=".litematic,.schem,.nbt,.bp">
           </div>
           <div class="selected-files" id="selected-files"></div>
         </div>
@@ -62,20 +62,24 @@
           <div class="card-description">Choose the format you want to convert to</div>
           <div class="format-options">
             <div class="format-option" data-format="litematic">
+              <img src="logos/litematic.png" alt="Litematica logo" class="format-logo" />
               <div class="format-name">Litematica</div>
               <div class="format-ext">.litematic</div>
             </div>
-            <div class="format-option" data-format="schematic">
-              <div class="format-name">WorldEdit</div>
-              <div class="format-ext">.schematic</div>
-            </div>
             <div class="format-option" data-format="schem">
-              <div class="format-name">Sponge</div>
+              <img src="logos/schem.png" alt="WorldEdit logo" class="format-logo" />
+              <div class="format-name">WorldEdit</div>
               <div class="format-ext">.schem</div>
             </div>
             <div class="format-option" data-format="nbt">
-              <div class="format-name">Structure</div>
+              <img src="logos/nbt.png" alt="Vanilla Structure logo" class="format-logo" />
+              <div class="format-name">Vanilla Structure</div>
               <div class="format-ext">.nbt</div>
+            </div>
+            <div class="format-option" data-format="bp">
+              <img src="logos/bp.png" alt="Axiom Blueprint logo" class="format-logo" />
+              <div class="format-name">Axiom Blueprint</div>
+              <div class="format-ext">.bp</div>
             </div>
           </div>
         </div>

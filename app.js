@@ -24,6 +24,8 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 const convertedDir = path.join(__dirname, 'converted');
 
+const SUPPORTED_FORMATS = new Set(['litematic', 'schem', 'nbt', 'bp']);
+
 async function prepareJava() {
   const result = await installJava();
   if (!result.success) {
@@ -35,19 +37,18 @@ async function prepareJava() {
 
 async function convertFiles(files, format) {
   await fs.mkdir(convertedDir, { recursive: true });
-  const converted = [];
-  for (const file of files) {
+
+  const tasks = files.map(async (file) => {
     const base = path.parse(file.originalname).name;
     const outputFile = `${base}.${format}`;
     const outputPath = path.join(convertedDir, outputFile);
 
     await runSchemConvert(file.path, outputPath, format);
-    converted.push({ filename: outputFile });
-
-    // Remove uploaded file after conversion
     await fs.unlink(file.path).catch(() => {});
-  }
-  return converted;
+    return { filename: outputFile };
+  });
+
+  return Promise.all(tasks);
 }
 
 async function startServer() {
@@ -62,11 +63,22 @@ async function startServer() {
   app.use(express.static(path.join(__dirname, 'public')));
   app.use('/converted', express.static(convertedDir));
 
+  app.get('/formats', (_req, res) => {
+    res.json({ formats: Array.from(SUPPORTED_FORMATS) });
+  });
+
   app.post('/convert', upload.array('files'), async (req, res) => {
     const format = req.body.format;
-    if (!['litematic', 'schem', 'nbt', 'bp'].includes(format)) {
+    if (!SUPPORTED_FORMATS.has(format)) {
       res.json({ success: false, error: 'Unsupported format' });
       return;
+    }
+    for (const f of req.files) {
+      const ext = path.extname(f.originalname).slice(1).toLowerCase();
+      if (!SUPPORTED_FORMATS.has(ext)) {
+        res.json({ success: false, error: `File type .${ext} is not supported` });
+        return;
+      }
     }
     try {
       const converted = await convertFiles(req.files, format);
