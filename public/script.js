@@ -1,7 +1,22 @@
 let selectedFiles = [];
 let selectedFormat = null;
+let supportedFormats = [];
 
-// Výber formátu
+async function loadFormats() {
+  try {
+    const res = await fetch('formats');
+    const data = await res.json();
+    supportedFormats = data.formats;
+    const accept = supportedFormats.map(f => '.' + f).join(',');
+    fileInput.setAttribute('accept', accept);
+    document.querySelector('.file-upload-subtext').textContent =
+      'Supported: ' + accept;
+  } catch (e) {
+    console.error('Failed to load formats', e);
+  }
+}
+
+// Format selection
 document.querySelectorAll(".format-option").forEach(option => {
   option.addEventListener("click", () => {
     document.querySelectorAll(".format-option").forEach(o => o.classList.remove("selected"));
@@ -11,15 +26,17 @@ document.querySelectorAll(".format-option").forEach(option => {
   });
 });
 
-// Výber súborov
+// File selection
 const fileInput = document.getElementById("file-input");
 const fileUpload = document.getElementById("file-upload");
 const selectedFilesContainer = document.getElementById("selected-files");
 
-// Po kliknutí na upload zónu otvorí dialóg pre výber súborov
+loadFormats();
+
+// Open file dialog when the upload area is clicked
 fileUpload.addEventListener("click", () => fileInput.click());
 
-// Umožní drag & drop nahrávanie súborov
+// Allow drag & drop file uploads
 fileUpload.addEventListener("dragover", (e) => {
   e.preventDefault();
   fileUpload.classList.add("dragover");
@@ -38,7 +55,7 @@ fileUpload.addEventListener("drop", (e) => {
   checkReadyState();
 });
 
-// Reaguje na zmenu inputu a prida nové súbory k existujúcim
+// Add newly selected files to the list when the input changes
 fileInput.addEventListener("change", (e) => {
   selectedFiles = selectedFiles.concat(Array.from(e.target.files));
   displaySelectedFiles();
@@ -74,10 +91,10 @@ function checkReadyState() {
   }
 }
 
-// Spustenie konverzie
+// Start conversion
 document.getElementById("start-button").addEventListener("click", async () => {
-  if (!["litematic", "schem", "schematic", "nbt"].includes(selectedFormat)) {
-    alert("Zvolený formát nie je podporovaný.");
+  if (!supportedFormats.includes(selectedFormat)) {
+    alert("The selected format is not supported.");
     return;
   }
 
@@ -98,15 +115,15 @@ document.getElementById("start-button").addEventListener("click", async () => {
     if (data.success) {
       showDownloadPage(data.converted);
     } else {
-      alert("Chyba pri konverzii: " + data.error);
+      alert("Conversion failed: " + data.error);
     }
   } catch (err) {
     console.error(err);
-    alert("Došlo k chybe pri odosielaní súborov.");
+    alert("There was an error uploading your files.");
   }
 });
 
-// Zobrazenie progres baru
+// Display progress bar
 function showProgress() {
   document.getElementById("progress-section").style.display = "block";
   document.getElementById("main-page").classList.add("disabled");
@@ -118,7 +135,7 @@ function showProgress() {
   convertIcon.classList.add("processing");
 }
 
-// Zobrazenie výsledkov
+// Show conversion results
 function showDownloadPage(convertedFiles) {
   document.getElementById("main-page").style.display = "none";
   document.getElementById("download-page").style.display = "block";
@@ -146,7 +163,7 @@ function showDownloadPage(convertedFiles) {
   });
 }
 
-// Tlačidlo Nová konverzia
+// "New Conversion" button
 document.getElementById("new-conversion-button").addEventListener("click", () => {
   location.reload();
 });
