@@ -4,6 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import multer from 'multer';
 import fs from 'fs/promises';
+import crypto from 'crypto';
 import dotenv from 'dotenv';
 
 import { installJava } from './scripts/install-java.js';
@@ -11,7 +12,16 @@ import runSchemConvert from './converter/runSchemConvert.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.join(__dirname, '.env') });
-const upload = multer({ dest: path.join(__dirname, 'uploads') });
+const uploadsDir = path.join(__dirname, 'uploads');
+const storage = multer.diskStorage({
+  destination: uploadsDir,
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    const name = crypto.randomBytes(16).toString('hex') + ext;
+    cb(null, name);
+  }
+});
+const upload = multer({ storage });
 const convertedDir = path.join(__dirname, 'converted');
 
 async function prepareJava() {
@@ -27,11 +37,14 @@ async function convertFiles(files, format) {
   await fs.mkdir(convertedDir, { recursive: true });
   const converted = [];
   for (const file of files) {
-    const name = path.parse(file.originalname).name;
-    const outputFile = `${name}.${format}`;
+    const base = path.parse(file.originalname).name;
+    const outputFile = `${base}.${format}`;
     const outputPath = path.join(convertedDir, outputFile);
+
     await runSchemConvert(file.path, outputPath, format);
     converted.push({ filename: outputFile });
+
+    // Remove uploaded file after conversion
     await fs.unlink(file.path).catch(() => {});
   }
   return converted;
