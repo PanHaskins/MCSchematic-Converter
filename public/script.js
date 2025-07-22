@@ -88,7 +88,8 @@ document.getElementById("start-button").addEventListener("click", async () => {
   showProgress();
 
   try {
-    const response = await fetch("/convert", {
+    // Use absolute URL based on current origin to avoid cross-origin issues
+    const response = await fetch(`${window.location.origin}/convert`, {
       method: "POST",
       body: formData
     });

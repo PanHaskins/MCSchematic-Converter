@@ -1,13 +1,16 @@
 import express from 'express';
+import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import multer from 'multer';
 import fs from 'fs/promises';
+import dotenv from 'dotenv';
 
 import { installJava } from './scripts/install-java.js';
 import runSchemConvert from './converter/runSchemConvert.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: path.join(__dirname, '.env') });
 const upload = multer({ dest: path.join(__dirname, 'uploads') });
 const convertedDir = path.join(__dirname, 'converted');
 
@@ -37,6 +40,9 @@ async function startServer() {
   await prepareJava();
 
   const app = express();
+  // Enable JSON body parsing and allow cross-origin requests
+  app.use(express.json());
+  app.use(cors());
   const PORT = process.env.PORT || 3000;
 
   app.use(express.static(path.join(__dirname, 'public')));

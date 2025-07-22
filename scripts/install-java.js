@@ -2,12 +2,17 @@ import { exec } from "child_process";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import dotenv from "dotenv";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: path.resolve(__dirname, "..", ".env") });
 
 class JavaInstaller {
   constructor() {
     this.javaDir = process.env.JAVA_DIR || "/home/container/java";
     this.javaVersion = process.env.JAVA_VERSION || "21";
-    this.baseUrl = "https://download.oracle.com/java";
+    // Allow overriding the base download URL via environment
+    this.baseUrl = process.env.JAVA_BASE_URL || "https://download.oracle.com/java";
     this.downloadUrl = `${this.baseUrl}/${this.javaVersion}/latest/jdk-${this.javaVersion}_linux-x64_bin.tar.gz`;
     this.jdkDirPattern = `jdk-${this.javaVersion}`;
   }
