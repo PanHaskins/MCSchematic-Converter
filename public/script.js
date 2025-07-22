@@ -111,12 +111,24 @@ function showProgress() {
   document.getElementById("progress-section").style.display = "block";
   document.getElementById("main-page").classList.add("disabled");
   document.getElementById("progress-fill").style.width = "100%";
+
+  document.getElementById("upload-icon").classList.add("complete");
+  const convertIcon = document.getElementById("convert-icon");
+  convertIcon.classList.remove("inactive");
+  convertIcon.classList.add("processing");
 }
 
 // Zobrazenie výsledkov
 function showDownloadPage(convertedFiles) {
   document.getElementById("main-page").style.display = "none";
   document.getElementById("download-page").style.display = "block";
+
+  const convertIcon = document.getElementById("convert-icon");
+  convertIcon.classList.remove("processing");
+  convertIcon.classList.add("complete");
+  const downloadIcon = document.getElementById("download-icon");
+  downloadIcon.classList.remove("inactive");
+  downloadIcon.classList.add("complete");
 
   const container = document.getElementById("download-files");
   container.innerHTML = "";
