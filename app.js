@@ -20,6 +20,7 @@ async function prepareJava() {
     console.error('Java is required but could not be installed.');
     process.exit(1);
   }
+  process.env.JAVA_PATH = result.javaPath;
 }
 
 async function convertFiles(files, format) {
