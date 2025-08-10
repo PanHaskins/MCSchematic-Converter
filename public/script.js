@@ -2,6 +2,10 @@ let selectedFiles = [];
 let selectedFormat = null;
 let supportedFormats = [];
 
+// Progress bar state
+let progressInterval = null;
+let progressValue = 0;
+
 async function loadFormats() {
   try {
     const res = await fetch('formats');
@@ -115,19 +119,33 @@ document.getElementById("start-button").addEventListener("click", async () => {
     if (data.success) {
       showDownloadPage(data.converted);
     } else {
-      alert("Conversion failed: " + data.error);
+      showErrorPage(data.error);
     }
   } catch (err) {
     console.error(err);
-    alert("There was an error uploading your files.");
+    showErrorPage({ code: 'NETWORK', message: 'There was an error uploading your files.' });
   }
 });
 
 // Display progress bar
 function showProgress() {
-  document.getElementById("progress-section").style.display = "block";
+  const progressSection = document.getElementById("progress-section");
+  const progressFill = document.getElementById("progress-fill");
+  const progressText = document.getElementById("progress-text");
+
+  progressSection.style.display = "block";
   document.getElementById("main-page").classList.add("disabled");
-  document.getElementById("progress-fill").style.width = "100%";
+
+  // Reset and start an incremental animation until the server responds
+  progressValue = 0;
+  progressFill.style.width = "0%";
+  progressText.textContent = "Converting files... 0%";
+
+  progressInterval = setInterval(() => {
+    progressValue = Math.min(progressValue + Math.random() * 10, 90);
+    progressFill.style.width = `${progressValue}%`;
+    progressText.textContent = `Converting files... ${Math.floor(progressValue)}%`;
+  }, 500);
 
   document.getElementById("upload-icon").classList.add("complete");
   const convertIcon = document.getElementById("convert-icon");
@@ -137,6 +155,13 @@ function showProgress() {
 
 // Show conversion results
 function showDownloadPage(convertedFiles) {
+  // Finalize progress bar before showing results
+  clearInterval(progressInterval);
+  const progressFill = document.getElementById("progress-fill");
+  const progressText = document.getElementById("progress-text");
+  progressFill.style.width = "100%";
+  progressText.textContent = "Converting files... 100%";
+
   document.getElementById("main-page").style.display = "none";
   document.getElementById("download-page").style.display = "block";
 
@@ -163,7 +188,34 @@ function showDownloadPage(convertedFiles) {
   });
 }
 
+// Show error page with explanation
+function showErrorPage(error) {
+  // Finalize progress bar before displaying the error page
+  clearInterval(progressInterval);
+  const progressFill = document.getElementById("progress-fill");
+  const progressText = document.getElementById("progress-text");
+  progressFill.style.width = "100%";
+  progressText.textContent = "Converting files... 100%";
+
+  document.getElementById("main-page").style.display = "none";
+  document.getElementById("progress-section").style.display = "none";
+  document.getElementById("error-page").style.display = "block";
+
+  const convertIcon = document.getElementById("convert-icon");
+  convertIcon.classList.remove("processing");
+  convertIcon.classList.add("error");
+
+  document.getElementById("error-title").textContent =
+    (error && error.code) ? error.code.replace(/_/g, ' ') : "ERROR";
+  document.getElementById("error-description").textContent =
+    (error && error.message) ? error.message : "An unknown error occurred during conversion.";
+}
+
 // "New Conversion" button
 document.getElementById("new-conversion-button").addEventListener("click", () => {
+  location.reload();
+});
+
+document.getElementById("error-new-conversion-button").addEventListener("click", () => {
   location.reload();
 });

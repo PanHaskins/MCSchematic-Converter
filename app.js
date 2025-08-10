@@ -26,6 +26,38 @@ const convertedDir = path.join(__dirname, 'converted');
 
 const SUPPORTED_FORMATS = new Set(['litematic', 'schem', 'nbt', 'bp']);
 
+/**
+ * Remove uploaded files to keep temporary storage clean.
+ * This runs even if some files are already deleted.
+ * @param {Array<{path: string}>} files
+ */
+async function cleanupUploads(files) {
+  await Promise.all(files.map(f => fs.unlink(f.path).catch(() => {})));
+}
+
+/**
+ * Map low-level errors to user-friendly explanations.
+ * @param {Error & {code?: string}} err
+ * @returns {{code: string, message: string}}
+ */
+function mapError(err) {
+  const msg = err.message || '';
+  switch (true) {
+    case err.code === 'ENOENT':
+      return {
+        code: 'JAVA_NOT_FOUND',
+        message: 'Java runtime could not be executed. Ensure Java is installed on the server.'
+      };
+    case /heap space/i.test(msg) || /outofmemory/i.test(msg):
+      return {
+        code: 'JAVA_HEAP_SPACE',
+        message: 'The converter ran out of memory (Java heap space). Try converting a smaller file or increasing server memory.'
+      };
+    default:
+      return { code: 'UNKNOWN', message: msg || 'Unknown error occurred during conversion.' };
+  }
+}
+
 async function prepareJava() {
   const result = await installJava();
   if (!result.success) {
@@ -70,13 +102,15 @@ async function startServer() {
   app.post('/convert', upload.array('files'), async (req, res) => {
     const format = req.body.format;
     if (!SUPPORTED_FORMATS.has(format)) {
-      res.json({ success: false, error: 'Unsupported format' });
+      await cleanupUploads(req.files);
+      res.json({ success: false, error: { code: 'UNSUPPORTED_FORMAT', message: 'The selected output format is not supported.' } });
       return;
     }
     for (const f of req.files) {
       const ext = path.extname(f.originalname).slice(1).toLowerCase();
       if (!SUPPORTED_FORMATS.has(ext)) {
-        res.json({ success: false, error: `File type .${ext} is not supported` });
+        await cleanupUploads(req.files);
+        res.json({ success: false, error: { code: 'FILE_TYPE_NOT_SUPPORTED', message: `File type .${ext} is not supported.` } });
         return;
       }
     }
@@ -85,7 +119,8 @@ async function startServer() {
       res.json({ success: true, converted });
     } catch (err) {
       console.error(err);
-      res.json({ success: false, error: err.message });
+      await cleanupUploads(req.files);
+      res.json({ success: false, error: mapError(err) });
     }
   });
 

@@ -121,6 +121,7 @@ body {
 
 .step-icon.inactive { background: #9ca3af; }
 .step-icon.processing { background: #3b82f6; animation: pulse 1.5s infinite; }
+.step-icon.error { background: #ef4444; }
 
 .step-label {
   font-size: 12px;
@@ -430,6 +431,45 @@ body {
 
 .download-button:hover {
   background: #16a34a;
+}
+
+.error-page {
+  display: none;
+  text-align: center;
+  padding: 40px 0;
+}
+
+.error-page.active {
+  display: block;
+}
+
+.error-container {
+  background: #fef2f2;
+  border: 2px solid #ef4444;
+  border-radius: 12px;
+  padding: 40px;
+  margin: 40px auto;
+  max-width: 600px;
+}
+
+.error-icon {
+  font-size: 64px;
+  color: #ef4444;
+  margin-bottom: 20px;
+}
+
+.error-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 20px;
+  color: #111827;
+  margin-bottom: 16px;
+  letter-spacing: 1px;
+}
+
+.error-description {
+  font-size: 16px;
+  color: #6b7280;
+  margin-bottom: 30px;
 }
 
 .download-all-button {
